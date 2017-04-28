@@ -24,11 +24,6 @@ class User(Base):
         self.password_hash = password_hash
         self.last_name = last_name
 
-    def __repr__(self):
-        return '<User {} {} {}>'.format(self.first_name, self.last_name, self.email)
-
 
 if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
-
-
