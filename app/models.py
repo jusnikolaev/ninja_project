@@ -16,6 +16,7 @@ class User(Base):
     email = Column(String(120), unique=True)
     password_hash = Column(String(120))
     last_name = Column(String(50))
+    session_id = Column(String(120))
 
     def __init__(self, first_name, email, password_hash,
                  last_name=None):
