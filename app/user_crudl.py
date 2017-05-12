@@ -9,7 +9,7 @@ import uuid
 def check_session(session_id):
     try:
         u = User.query.filter_by(session_id=session_id).first()
-        return u.first_name
+        return u.id
     except AttributeError:
         return None
 
@@ -96,3 +96,29 @@ def auth(email, password):
         return session_id
     else:
         return False
+
+
+# Регистрация в телеграмме
+def telegram_registration(session_id):
+    telegram_guid = str(uuid.uuid4())
+    u = User.query.filter_by(session_id=session_id).first()
+    u.telegram_id = telegram_guid
+    db_session.commit()
+    return telegram_guid
+
+
+# Регистрация в телеграмме 2....
+def telegram_registration_final(guid, chat_id):
+    u = User.query.filter_by(telegram_id=guid).first()
+    if u:
+        u.telegram_id = chat_id
+        db_session.commit()
+        return True
+    else:
+        return False
+
+# Проверка пользователя по телеграм айди
+def check_user(chat_id):
+    u = User.query.filter_by(telegram_id=chat_id)
+    return u.telegram_id
+

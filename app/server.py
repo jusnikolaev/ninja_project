@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, abort
 import jinja2
-from user_crudl import check_session, auth, delete_session
+from user_crudl import check_session, auth, delete_session, telegram_registration
+import webbrowser
 
 """Сервер"""
 
@@ -32,9 +33,20 @@ def login():
             response.set_cookie('session_id', value=session_id)
             return response
         else:
-            return 'Error'
+            return abort(401)
     else:
-        return 'Error'
+        return abort(401)
+
+
+@app.route('/telegram_reg/')
+def telegram_reg():
+    session_id = request.cookies.get('session_id')
+    if session_id is None or check_session(session_id) is None:
+        return abort(401)
+    else:
+        url = 'https://telegram.me/ninjaproject_bot?start=' + telegram_registration(session_id)
+        webbrowser.open_new_tab(url)
+    return redirect('/home')
 
 
 # Выход с сайта
