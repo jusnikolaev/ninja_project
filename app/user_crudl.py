@@ -45,11 +45,14 @@ def check_pass(password_hash, password):
 
 # Создание пользователя
 def create_user(first_name, email, password, last_name=None):
-    pass_hash = generate_pass_hash(password)
-    new_user = User(first_name, email, pass_hash, last_name)
-    db_session.add(new_user)
-    db_session.commit()
-    return "Пользователь успешно создан"
+    if first_name and email and password:
+        pass_hash = generate_pass_hash(password)
+        new_user = User(first_name, email, pass_hash, last_name)
+        db_session.add(new_user)
+        db_session.commit()
+        return True
+    else:
+        return False
 
 
 # Получение данных пользователя
@@ -117,8 +120,8 @@ def telegram_registration_final(guid, chat_id):
     else:
         return False
 
+
 # Проверка пользователя по телеграм айди
 def check_user(chat_id):
     u = User.query.filter_by(telegram_id=chat_id)
     return u.telegram_id
-

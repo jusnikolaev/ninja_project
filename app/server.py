@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, abort
 import jinja2
-from user_crudl import check_session, auth, delete_session, telegram_registration
+from user_crudl import check_session, auth, delete_session, telegram_registration, create_user
 import webbrowser
 
 """Сервер"""
@@ -18,6 +18,20 @@ def index():
         return render_template('index.html')
     else:
         return redirect('/home')
+
+
+@app.route('/registration/', methods=['Post'])
+def user_registration():
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    if create_user(first_name, email, password, last_name):
+        a = auth(email, password)
+        print(a)
+        return redirect('/home')
+    else:
+        return 'Error'
 
 
 # Авторизация
