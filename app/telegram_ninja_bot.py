@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Словарь для конв хэндлера
 TITLE, DESCRIPTION, PUBLIC = range(3)
+LIST, CHOISE_POST, UPDATE = range(3)
 
 # Словарь для Названия и Описания поста
 post_values = {'title': 0, 'description': 0}
@@ -76,6 +77,7 @@ def cancel(bot, update):
     print('Stop')
     return ConversationHandler.END
 
+
 def list_posts(bot, update):
     result = ''
     chat_id = update.message.chat_id
@@ -84,24 +86,44 @@ def list_posts(bot, update):
         message = '/{}\n'.format(list[i].title)
         result += message
     bot.sendMessage(chat_id=chat_id, text=result)
+    return LIST
 
+
+def choise_post(bot, update):
+    list = []
+    chat_id = update.message.chat_id
+    title = update.message.text
+    clear_title = title.split('/')
+    clear_title = str(clear_title[1])
+    posts = list_of_posts(chat_id)
+    for i in range(len(posts)):
+        if posts[i].title == clear_title:
+            bot.sendMessage(chat_id=chat_id, text = posts[i].description)
+            list.append(posts[i].description)
+    return CHOISE_POST
 
 
 def main():
-
     updater = Updater('133728555:AAE8ql64wXK9IcnLXTm9YMEP38REaemfvg8')
     dp = updater.dispatcher
 
-    conv_handler = ConversationHandler(entry_points=[CommandHandler('new', add_post)],
-                                       states={
-                                           TITLE: [MessageHandler(Filters.text, add_title)],
-                                           DESCRIPTION: [MessageHandler(Filters.text, add_description)],
-                                           PUBLIC: [CommandHandler('create', create_new_post)]
-                                       },
-                                       fallbacks=[CommandHandler('cancel', cancel)])
+    conv_handler_new_post = ConversationHandler(entry_points=[CommandHandler('new', add_post)],
+                                                states={
+                                                    TITLE: [MessageHandler(Filters.text, add_title)],
+                                                    DESCRIPTION: [MessageHandler(Filters.text, add_description)],
+                                                    PUBLIC: [CommandHandler('create', create_new_post)]
+                                                },
+                                                fallbacks=[CommandHandler('cancel', cancel)])
+
+    conv_handler_post_uld = ConversationHandler(entry_points=[CommandHandler('list', list_posts)],
+                                                states={
+                                                    LIST: [MessageHandler(Filters.command, choise_post)]
+                                                },
+                                                fallbacks=[CommandHandler('cancel', cancel)])
+
     dp.add_handler(CommandHandler('start', registration, pass_args=True))
-    dp.add_handler(CommandHandler('list', list_posts))
-    dp.add_handler(conv_handler)
+    dp.add_handler(conv_handler_post_uld)
+    dp.add_handler(conv_handler_new_post)
     dp.add_error_handler(error)
 
     updater.start_polling()

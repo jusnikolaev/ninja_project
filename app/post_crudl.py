@@ -25,9 +25,3 @@ def list_of_posts(chat_id):
 
 
 
-
-# def test_2(user):
-#     u = User.query.filter_by(id=user).first()
-#     print(str(u.posts[0].title))
-#
-# test_2(1)
